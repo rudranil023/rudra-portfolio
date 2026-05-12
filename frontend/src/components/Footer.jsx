@@ -1,4 +1,5 @@
-import { Github, Linkedin, Mail, Twitter } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -17,11 +18,11 @@ const Footer = () => {
           <div className="flex space-x-6">
             <a href="https://github.com/rudranilkoley" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">
               <span className="sr-only">GitHub</span>
-              <Github size={24} />
+              <FaGithub size={24} />
             </a>
             <a href="https://linkedin.com/in/rudranilkoley" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">
               <span className="sr-only">LinkedIn</span>
-              <Linkedin size={24} />
+              <FaLinkedin size={24} />
             </a>
             <a href="mailto:rudranil@example.com" className="text-gray-400 hover:text-white transition-colors">
               <span className="sr-only">Email</span>

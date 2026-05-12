@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ExternalLink, Github } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 
 const Projects = ({ projects }) => {
   return (
@@ -50,7 +51,7 @@ const Projects = ({ projects }) => {
                 <div className="flex gap-4 mt-auto pt-4 border-t border-white/10">
                   {project.githubLink && (
                     <a href={project.githubLink} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm text-gray-300 hover:text-white transition-colors">
-                      <Github size={16} /> Code
+                      <FaGithub size={16} /> Code
                     </a>
                   )}
                   {project.liveLink && (

@@ -32,11 +32,15 @@ import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import certificationRoutes from './routes/certifications.js';
 import messageRoutes from './routes/messages.js';
+import skillRoutes from './routes/skills.js';
+import settingRoutes from './routes/settings.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/certifications', certificationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/settings', settingRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

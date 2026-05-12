@@ -11,23 +11,22 @@ mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('MongoDB Connected for Seeding');
     
-    // Check if admin exists
-    const existingAdmin = await User.findOne({ username: 'admin' });
-    if (existingAdmin) {
-      console.log('Admin user already exists');
-      process.exit(0);
-    }
+    // Clear existing users to ensure clean state
+    await User.deleteMany({});
+    console.log('Cleared existing users');
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('admin123', salt);
+    const hashedPassword = await bcrypt.hash('Password', salt);
 
     const admin = new User({
-      username: 'admin',
-      password: hashedPassword
+      email: 'rudranilkoley64@gmail.com',
+      password: hashedPassword,
+      name: 'Rudranil Koley',
+      roleTitles: ['Data Analyst', 'Full Stack Developer']
     });
 
     await admin.save();
-    console.log('Admin user created with username: admin, password: admin123');
+    console.log('Admin user created with email: rudranilkoley64@gmail.com, password: Password');
     process.exit(0);
   })
   .catch(err => {
