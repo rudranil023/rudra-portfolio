@@ -44,12 +44,20 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <a 
-              href="#resume" 
-              className="inline-block ml-4 bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-primary/25"
-            >
-              Resume
-            </a>
+            <div className="flex items-center ml-4 space-x-4 border-l border-white/10 pl-4">
+              <a 
+                href="/admin/login" 
+                className="text-gray-300 hover:text-primary transition-colors text-sm font-medium"
+              >
+                Admin
+              </a>
+              <a 
+                href="#resume" 
+                className="inline-block bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-primary/25"
+              >
+                Resume
+              </a>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,13 +90,22 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <a 
-              href="#resume" 
-              onClick={() => setIsOpen(false)}
-              className="bg-primary hover:bg-primary/90 text-white block px-3 py-2 rounded-md text-base font-medium text-center mt-4 transition-all hover:scale-[1.02] active:scale-95 hover:shadow-lg hover:shadow-primary/25"
-            >
-              Resume
-            </a>
+            <div className="pt-4 mt-2 border-t border-white/10 flex flex-col gap-3">
+              <a 
+                href="/admin/login" 
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors block px-3 py-2 text-center text-sm font-medium"
+              >
+                Admin Login
+              </a>
+              <a 
+                href="#resume" 
+                onClick={() => setIsOpen(false)}
+                className="bg-primary hover:bg-primary/90 text-white block px-3 py-2 rounded-md text-base font-medium text-center transition-all hover:scale-[1.02] active:scale-95 hover:shadow-lg hover:shadow-primary/25"
+              >
+                Resume
+              </a>
+            </div>
           </div>
         </motion.div>
       )}
