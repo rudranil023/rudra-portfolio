@@ -11,7 +11,7 @@ const Contact = () => {
     e.preventDefault();
     setStatus('sending');
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/messages', formData);
+      await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/messages', formData);
       setStatus('success');
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus(null), 3000);

@@ -11,12 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://rudra-portfolio-theta.vercel.app']
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // DB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
@@ -35,17 +37,17 @@ import messageRoutes from './routes/messages.js';
 import skillRoutes from './routes/skills.js';
 import settingRoutes from './routes/settings.js';
 
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/certifications', certificationRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/skills', skillRoutes);
-app.use('/api/settings', settingRoutes);
+const router = express.Router();
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+router.use('/auth', authRoutes);
+router.use('/projects', projectRoutes);
+router.use('/certifications', certificationRoutes);
+router.use('/messages', messageRoutes);
+router.use('/skills', skillRoutes);
+router.use('/settings', settingRoutes);
 
+app.use('/api', router);
+app.use('/.netlify/functions/api', router);
+
+// Export app for serverless
 export default app;
