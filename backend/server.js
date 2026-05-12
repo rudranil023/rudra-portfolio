@@ -29,6 +29,10 @@ app.get('/', (req, res) => {
   res.send('Portfolio API is running');
 });
 
+app.get('/.netlify/functions/api', (req, res) => {
+  res.send('Portfolio API is running securely on Netlify Serverless');
+});
+
 // Import Routes
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
