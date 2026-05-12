@@ -34,12 +34,12 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [projRes, certRes, msgRes, skillRes, setRes, profRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/projects'),
-        axios.get('http://localhost:5000/api/certifications'),
-        axios.get('http://localhost:5000/api/messages', { headers }),
-        axios.get('http://localhost:5000/api/skills'),
-        axios.get('http://localhost:5000/api/settings'),
-        axios.get('http://localhost:5000/api/auth/me', { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/projects'),
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/certifications'),
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/messages', { headers }),
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/skills'),
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/settings'),
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/auth/me', { headers })
       ]);
       
       setProjects(projRes.data);
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
     const formData = new FormData();
     Object.keys(newProject).forEach(key => formData.append(key, newProject[key]));
     try {
-      await axios.post('http://localhost:5000/api/projects', formData, getConfig(true));
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/projects', formData, getConfig(true));
       fetchData();
       setNewProject({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', image: null });
     } catch (error) { console.error(error); }
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
 
   const handleDeleteProject = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/projects/${id}`, getConfig());
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + `/projects/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -105,7 +105,7 @@ const AdminDashboard = () => {
     const formData = new FormData();
     Object.keys(newCert).forEach(key => formData.append(key, newCert[key]));
     try {
-      await axios.post('http://localhost:5000/api/certifications', formData, getConfig(true));
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/certifications', formData, getConfig(true));
       fetchData();
       setNewCert({ title: '', issuer: '', date: '', image: null });
     } catch (error) { console.error(error); }
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
 
   const handleDeleteCert = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/certifications/${id}`, getConfig());
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + `/certifications/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
   const handleAddSkill = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/skills', newSkill, getConfig());
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/skills', newSkill, getConfig());
       fetchData();
       setNewSkill({ name: '', percentage: '', icon: '' });
     } catch (error) { console.error(error); }
@@ -129,14 +129,14 @@ const AdminDashboard = () => {
 
   const handleDeleteSkill = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/skills/${id}`, getConfig());
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + `/skills/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
 
   const handleDeleteMessage = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/messages/${id}`, getConfig());
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + `/messages/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
         contactDetails: { phone: profile.phone, address: profile.address },
         socialLinks: { linkedin: profile.linkedin, github: profile.github, twitter: profile.twitter, instagram: profile.instagram }
       };
-      await axios.put('http://localhost:5000/api/auth/me/profile', payload, getConfig());
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/auth/me/profile', payload, getConfig());
       alert('Profile updated successfully');
     } catch (error) { console.error(error); }
   };
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:5000/api/settings', settings, getConfig());
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/settings', settings, getConfig());
       alert('Settings updated successfully');
     } catch (error) { console.error(error); }
   };
@@ -582,7 +582,7 @@ const AdminDashboard = () => {
                               formData.append('resume', file);
                               try {
                                 const token = localStorage.getItem('token');
-                                await axios.put('http://localhost:5000/api/auth/me/resume', formData, {
+                                await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/auth/me/resume', formData, {
                                   headers: {
                                     Authorization: `Bearer ${token}`,
                                     'Content-Type': 'multipart/form-data'

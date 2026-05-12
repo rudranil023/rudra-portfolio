@@ -18,8 +18,8 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [projRes, certRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/projects'),
-          axios.get('http://localhost:5000/api/certifications')
+          axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/projects'),
+          axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}` + '/certifications')
         ]);
         setProjects(projRes.data);
         setCertifications(certRes.data);
