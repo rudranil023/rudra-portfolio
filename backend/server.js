@@ -23,16 +23,27 @@ const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
 } else {
-  mongoose.connect(MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error('MongoDB Connection Error:', err));
+  console.log('Attempting to connect to MongoDB...');
+  // Log a masked version of the URI for debugging
+  const maskedURI = MONGODB_URI.replace(/\/\/.*:.*@/, '//****:****@');
+  console.log('Target URI:', maskedURI);
+
+  mongoose.connect(MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of hanging
+  })
+    .then(() => console.log('MongoDB Connected successfully'))
+    .catch(err => {
+      console.error('MongoDB Connection Error:', err.message);
+    });
 }
 
 // Basic route
 app.get('/', (req, res) => {
   res.json({
     message: 'Portfolio API is running',
-    dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 
+              mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
+    uriPresent: !!MONGODB_URI,
     environment: process.env.NODE_ENV || 'production'
   });
 });
