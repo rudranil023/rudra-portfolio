@@ -7,7 +7,7 @@ import path from 'path';
 // Load env vars
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
