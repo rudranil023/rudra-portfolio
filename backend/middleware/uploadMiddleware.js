@@ -4,8 +4,8 @@ import fs from 'fs';
 import os from 'os';
 
 // Ensure uploads directory exists
-// Use /tmp for serverless environments like Netlify (AWS Lambda)
-const isServerless = process.env.NETLIFY === 'true' || process.env.AWS_LAMBDA_FUNCTION_VERSION || process.env.LAMBDA_TASK_ROOT;
+// Use /tmp for serverless environments like Netlify/Vercel (AWS Lambda)
+const isServerless = process.env.VERCEL === '1' || process.env.NETLIFY === 'true' || process.env.AWS_LAMBDA_FUNCTION_VERSION;
 const uploadDir = isServerless ? path.join(os.tmpdir(), 'uploads') : path.join(process.cwd(), 'uploads');
 
 try {

@@ -87,10 +87,6 @@ app.get('/', async (req, res) => {
   });
 });
 
-app.get('/.netlify/functions/api', (req, res) => {
-  res.send('Portfolio API is running securely on Netlify Serverless');
-});
-
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.get('/favicon.png', (req, res) => res.status(204).end());
 
@@ -125,7 +121,6 @@ const dbMiddleware = async (req, res, next) => {
 };
 
 app.use('/api', dbMiddleware, router);
-app.use('/.netlify/functions/api', dbMiddleware, router);
 
 // Export app for serverless
 export default app;
