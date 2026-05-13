@@ -37,8 +37,8 @@ async function connectToDatabase() {
   try {
     console.log('Connecting to MongoDB...');
     const conn = await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 20000,
-      connectTimeoutMS: 20000,
+      serverSelectionTimeoutMS: 60000,
+      connectTimeoutMS: 60000,
       dbName: 'protfolio',
     });
     
