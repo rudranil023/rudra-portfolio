@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Award, BookOpen, Briefcase, Code } from 'lucide-react';
 
-const About = () => {
+const About = ({ profile }) => {
   const stats = [
     { label: 'Experience', value: '1+', icon: Briefcase },
     { label: 'Projects', value: '10+', icon: Code },
@@ -30,7 +30,7 @@ const About = () => {
             <div className="glass-card relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <img 
-                src="/about-image.webp" 
+                src="/profile-photo.jpeg" 
                 alt="About Me" 
                 className="w-full h-auto rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500"
                 onError={(e) => { e.target.src = 'https://via.placeholder.com/600x400/0f0f0f/2563eb?text=Data+Analytics' }}
@@ -45,21 +45,29 @@ const About = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-7 space-y-6"
           >
-            <h3 className="text-2xl font-semibold text-white">
-              Final-year B.Tech ECE student with a passion for Data
-            </h3>
-            
-            <p className="text-gray-400 leading-relaxed">
-              I am highly interested in Data Analytics and Business Intelligence. With a strong foundation in Electronics and Communication Engineering, I bring analytical thinking and problem-solving skills to the world of data.
-            </p>
-            
-            <p className="text-gray-400 leading-relaxed">
-              Skilled in Excel, SQL, Power BI, and Python, I excel at data cleaning, visualization, and creating insightful dashboards that drive business decisions. I also possess strong communication skills, having gained experience as a Business Development Intern.
-            </p>
+            {profile?.bio ? (
+              <div className="text-gray-400 leading-relaxed whitespace-pre-line">
+                {profile.bio}
+              </div>
+            ) : (
+              <>
+                <h3 className="text-2xl font-semibold text-white">
+                  Final-year B.Tech ECE student with a passion for Data
+                </h3>
+                
+                <p className="text-gray-400 leading-relaxed">
+                  I am highly interested in Data Analytics and Business Intelligence. With a strong foundation in Electronics and Communication Engineering, I bring analytical thinking and problem-solving skills to the world of data.
+                </p>
+                
+                <p className="text-gray-400 leading-relaxed">
+                  Skilled in Excel, SQL, Power BI, and Python, I excel at data cleaning, visualization, and creating insightful dashboards that drive business decisions. I also possess strong communication skills, having gained experience as a Business Development Intern.
+                </p>
 
-            <p className="text-gray-300 font-medium pb-4 border-b border-white/10">
-              Actively seeking opportunities as a Data Analyst or Business Intelligence Learner.
-            </p>
+                <p className="text-gray-300 font-medium pb-4 border-b border-white/10">
+                  Actively seeking opportunities as a Data Analyst or Business Intelligence Learner.
+                </p>
+              </>
+            )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
               {stats.map((stat, index) => (

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export const AuthContext = createContext();
 
@@ -10,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/auth/me', {
+      axios.get(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         setUser(res.data);
@@ -25,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/auth/login', { email, password });
+    const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
     localStorage.setItem('token', res.data.token);
     setUser({ email: res.data.email, name: res.data.name });
   };

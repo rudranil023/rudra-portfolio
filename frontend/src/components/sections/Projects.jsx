@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
+import { IMAGE_BASE_URL } from '../../config';
 
 const Projects = ({ projects }) => {
   return (
@@ -31,7 +32,7 @@ const Projects = ({ projects }) => {
                 <div className="relative h-48 -mt-6 -mx-6 mb-6 overflow-hidden bg-dark">
                   <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors z-10"></div>
                   <img 
-                    src={project.image ? `http://localhost:5000${project.image}` : 'https://via.placeholder.com/600x400/0f0f0f/7c3aed?text=Project'} 
+                    src={project.image ? `${IMAGE_BASE_URL}${project.image}` : ''} 
                     alt={project.title} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

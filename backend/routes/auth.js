@@ -26,7 +26,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get current user profile
+// Get public profile (for frontend display)
+router.get('/public-profile', async (req, res) => {
+  try {
+    // Assuming the first user is the admin.
+    const user = await User.findOne().select('-password -_id -createdAt -updatedAt -__v');
+    if (!user) return res.status(404).json({ message: 'Profile not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get current user profile (protected)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -62,7 +74,11 @@ router.put('/me/resume', authMiddleware, upload.single('resume'), async (req, re
     if (user.resumeUrl) {
       const filePath = path.join(process.cwd(), user.resumeUrl);
       if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+        try {
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.warn("Could not delete old resume:", err.message);
+        }
       }
     }
     

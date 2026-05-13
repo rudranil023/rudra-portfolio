@@ -1,16 +1,6 @@
 import { motion } from 'framer-motion';
 
-const Skills = () => {
-  const skills = [
-    { name: 'Excel', level: 90 },
-    { name: 'SQL', level: 85 },
-    { name: 'Power BI', level: 80 },
-    { name: 'Python', level: 75 },
-    { name: 'Data Cleaning', level: 95 },
-    { name: 'Data Visualization', level: 85 },
-    { name: 'Dashboard Design', level: 80 },
-    { name: 'Business Analytics', level: 75 },
-  ];
+const Skills = ({ skills = [] }) => {
 
   return (
     <section id="skills" className="py-24 relative bg-black/50">
@@ -33,13 +23,13 @@ const Skills = () => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h4 className="text-lg font-semibold text-white group-hover:text-primary transition-colors">{skill.name}</h4>
-                <span className="text-accent font-medium">{skill.level}%</span>
+                <span className="text-accent font-medium">{skill.percentage}%</span>
               </div>
               
               <div className="w-full bg-dark rounded-full h-2.5 overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
-                  whileInView={{ width: `${skill.level}%` }}
+                  whileInView={{ width: `${skill.percentage}%` }}
                   viewport={{ once: true }}
                   transition={{ duration: 1, delay: 0.5 }}
                   className="bg-gradient-to-r from-primary to-accent h-2.5 rounded-full"

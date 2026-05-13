@@ -15,18 +15,26 @@ mongoose.connect(MONGODB_URI)
     await User.deleteMany({});
     console.log('Cleared existing users');
 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.error('Error: ADMIN_EMAIL and ADMIN_PASSWORD must be provided in .env');
+      process.exit(1);
+    }
+
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('Password', salt);
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
 
     const admin = new User({
-      email: 'rudranilkoley64@gmail.com',
+      email: adminEmail,
       password: hashedPassword,
       name: 'Rudranil Koley',
-      roleTitles: ['Data Analyst', 'Full Stack Developer']
+      roleTitles: ['Data Analyst', 'Business Intelligence Learner']
     });
 
     await admin.save();
-    console.log('Admin user created with email: rudranilkoley64@gmail.com, password: Password');
+    console.log(`Admin user created with email: ${adminEmail}`);
     process.exit(0);
   })
   .catch(err => {

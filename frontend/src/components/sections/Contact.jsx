@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 
-const Contact = () => {
+const Contact = ({ profile }) => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState(null);
 
@@ -11,7 +12,7 @@ const Contact = () => {
     e.preventDefault();
     setStatus('sending');
     try {
-      await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/messages', formData);
+      await axios.post(`${API_BASE_URL}/messages`, formData);
       setStatus('success');
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus(null), 3000);
@@ -45,25 +46,25 @@ const Contact = () => {
             </p>
             
             <div className="space-y-6">
-              <div className="flex items-center gap-4 text-gray-300">
-                <div className="w-12 h-12 rounded-full glass flex items-center justify-center text-primary">
+              <a href={`mailto:${profile?.email || 'rudranilkoley64@gmail.com'}`} className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors group">
+                <div className="w-12 h-12 rounded-full glass flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
                   <Mail size={20} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium text-white">rudranilkoley@example.com</p>
+                  <p className="text-sm text-gray-500 group-hover:text-gray-300 transition-colors">Email</p>
+                  <p className="font-medium text-white group-hover:text-primary transition-colors">{profile?.email || 'rudranilkoley64@gmail.com'}</p>
                 </div>
-              </div>
+              </a>
               
-              <div className="flex items-center gap-4 text-gray-300">
-                <div className="w-12 h-12 rounded-full glass flex items-center justify-center text-primary">
+              <a href={`tel:${profile?.contactDetails?.phone || '+918345026386'}`} className="flex items-center gap-4 text-gray-300 hover:text-white transition-colors group">
+                <div className="w-12 h-12 rounded-full glass flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
                   <Phone size={20} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-medium text-white">+91 12345 67890</p>
+                  <p className="text-sm text-gray-500 group-hover:text-gray-300 transition-colors">Phone</p>
+                  <p className="font-medium text-white group-hover:text-primary transition-colors">{profile?.contactDetails?.phone || '+91 83450 26386'}</p>
                 </div>
-              </div>
+              </a>
               
               <div className="flex items-center gap-4 text-gray-300">
                 <div className="w-12 h-12 rounded-full glass flex items-center justify-center text-primary">
@@ -71,7 +72,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  <p className="font-medium text-white">India</p>
+                  <p className="font-medium text-white">{profile?.contactDetails?.address || 'Kolkata, India'}</p>
                 </div>
               </div>
             </div>

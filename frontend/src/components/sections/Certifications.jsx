@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Award, CheckCircle } from 'lucide-react';
+import { IMAGE_BASE_URL } from '../../config';
 
 const Certifications = ({ certifications }) => {
   return (
@@ -28,7 +29,7 @@ const Certifications = ({ certifications }) => {
               >
                 <div className="w-16 h-16 rounded-full bg-dark border-2 border-white/10 flex items-center justify-center mb-4 overflow-hidden shadow-lg shadow-primary/20">
                   {cert.image ? (
-                     <img src={`http://localhost:5000${cert.image}`} alt={cert.title} className="w-full h-full object-cover" />
+                     <img src={`${IMAGE_BASE_URL}${cert.image}`} alt={cert.title} className="w-full h-full object-cover" />
                   ) : (
                      <Award className="text-accent" size={30} />
                   )}

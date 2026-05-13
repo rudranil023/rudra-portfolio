@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, FileCode2, Award, MessageSquare, LogOut, Plus, Trash2, Settings as SettingsIcon, UserCircle, Code2, FileText, Upload } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const AdminDashboard = () => {
   const { user, loading, logout } = useContext(AuthContext);
@@ -34,12 +35,12 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [projRes, certRes, msgRes, skillRes, setRes, profRes] = await Promise.all([
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/projects'),
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/certifications'),
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/messages', { headers }),
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/skills'),
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/settings'),
-        axios.get('https://elegant-griffin-b9b3a0.netlify.app/api/auth/me', { headers })
+        axios.get(`${API_BASE_URL}/projects`),
+        axios.get(`${API_BASE_URL}/certifications`),
+        axios.get(`${API_BASE_URL}/messages`, { headers }),
+        axios.get(`${API_BASE_URL}/skills`),
+        axios.get(`${API_BASE_URL}/settings`),
+        axios.get(`${API_BASE_URL}/auth/me`, { headers })
       ]);
       
       setProjects(projRes.data);
@@ -87,7 +88,7 @@ const AdminDashboard = () => {
     const formData = new FormData();
     Object.keys(newProject).forEach(key => formData.append(key, newProject[key]));
     try {
-      await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/projects', formData, getConfig(true));
+      await axios.post(`${API_BASE_URL}/projects`, formData, getConfig(true));
       fetchData();
       setNewProject({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', image: null });
     } catch (error) { console.error(error); }
@@ -95,7 +96,7 @@ const AdminDashboard = () => {
 
   const handleDeleteProject = async (id) => {
     try {
-      await axios.delete(`https://elegant-griffin-b9b3a0.netlify.app/api/projects/${id}`, getConfig());
+      await axios.delete(`${API_BASE_URL}/projects/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -105,7 +106,7 @@ const AdminDashboard = () => {
     const formData = new FormData();
     Object.keys(newCert).forEach(key => formData.append(key, newCert[key]));
     try {
-      await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/certifications', formData, getConfig(true));
+      await axios.post(`${API_BASE_URL}/certifications`, formData, getConfig(true));
       fetchData();
       setNewCert({ title: '', issuer: '', date: '', image: null });
     } catch (error) { console.error(error); }
@@ -113,7 +114,7 @@ const AdminDashboard = () => {
 
   const handleDeleteCert = async (id) => {
     try {
-      await axios.delete(`https://elegant-griffin-b9b3a0.netlify.app/api/certifications/${id}`, getConfig());
+      await axios.delete(`${API_BASE_URL}/certifications/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
   const handleAddSkill = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://elegant-griffin-b9b3a0.netlify.app/api/skills', newSkill, getConfig());
+      await axios.post(`${API_BASE_URL}/skills`, newSkill, getConfig());
       fetchData();
       setNewSkill({ name: '', percentage: '', icon: '' });
     } catch (error) { console.error(error); }
@@ -129,14 +130,14 @@ const AdminDashboard = () => {
 
   const handleDeleteSkill = async (id) => {
     try {
-      await axios.delete(`https://elegant-griffin-b9b3a0.netlify.app/api/skills/${id}`, getConfig());
+      await axios.delete(`${API_BASE_URL}/skills/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
 
   const handleDeleteMessage = async (id) => {
     try {
-      await axios.delete(`https://elegant-griffin-b9b3a0.netlify.app/api/messages/${id}`, getConfig());
+      await axios.delete(`${API_BASE_URL}/messages/${id}`, getConfig());
       fetchData();
     } catch (error) { console.error(error); }
   };
@@ -151,7 +152,7 @@ const AdminDashboard = () => {
         contactDetails: { phone: profile.phone, address: profile.address },
         socialLinks: { linkedin: profile.linkedin, github: profile.github, twitter: profile.twitter, instagram: profile.instagram }
       };
-      await axios.put('https://elegant-griffin-b9b3a0.netlify.app/api/auth/me/profile', payload, getConfig());
+      await axios.put(`${API_BASE_URL}/auth/me/profile`, payload, getConfig());
       alert('Profile updated successfully');
     } catch (error) { console.error(error); }
   };
@@ -159,7 +160,7 @@ const AdminDashboard = () => {
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('https://elegant-griffin-b9b3a0.netlify.app/api/settings', settings, getConfig());
+      await axios.put(`${API_BASE_URL}/settings`, settings, getConfig());
       alert('Settings updated successfully');
     } catch (error) { console.error(error); }
   };
@@ -582,7 +583,7 @@ const AdminDashboard = () => {
                               formData.append('resume', file);
                               try {
                                 const token = localStorage.getItem('token');
-                                await axios.put('https://elegant-griffin-b9b3a0.netlify.app/api/auth/me/resume', formData, {
+                                await axios.put(`${API_BASE_URL}/auth/me/resume`, formData, {
                                   headers: {
                                     Authorization: `Bearer ${token}`,
                                     'Content-Type': 'multipart/form-data'
