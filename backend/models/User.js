@@ -20,4 +20,4 @@ const userSchema = new mongoose.Schema({
   profileImage: { type: String, default: '' }
 }, { timestamps: true });
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema, 'Users');

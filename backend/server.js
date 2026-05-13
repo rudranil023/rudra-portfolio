@@ -23,15 +23,15 @@ const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
 } else {
-  console.log('Attempting to connect to MongoDB...');
-  // Log a masked version of the URI for debugging
-  const maskedURI = MONGODB_URI.replace(/\/\/.*:.*@/, '//****:****@');
-  console.log('Target URI:', maskedURI);
+  // Check if URI includes the database name from your screenshot
+  if (!MONGODB_URI.includes('/protfolio')) {
+    console.warn('WARNING: Your MONGODB_URI might be missing the "/protfolio" database name found in your Atlas screenshot.');
+  }
 
   mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of hanging
+    serverSelectionTimeoutMS: 10000, // Wait 10s for connection
   })
-    .then(() => console.log('MongoDB Connected successfully'))
+    .then(() => console.log('MongoDB Connected to:', mongoose.connection.name))
     .catch(err => {
       console.error('MongoDB Connection Error:', err.message);
     });
@@ -43,6 +43,7 @@ app.get('/', (req, res) => {
     message: 'Portfolio API is running',
     dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 
               mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
+    dbName: mongoose.connection.name,
     uriPresent: !!MONGODB_URI,
     environment: process.env.NODE_ENV || 'production'
   });
@@ -51,6 +52,9 @@ app.get('/', (req, res) => {
 app.get('/.netlify/functions/api', (req, res) => {
   res.send('Portfolio API is running securely on Netlify Serverless');
 });
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get('/favicon.png', (req, res) => res.status(204).end());
 
 // Import Routes
 import { authRoutes } from './routes/auth.js';
