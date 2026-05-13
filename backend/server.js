@@ -22,6 +22,8 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // DB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
+let lastError = null;
+
 if (!MONGODB_URI) {
   console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
 } else {
@@ -31,41 +33,29 @@ if (!MONGODB_URI) {
   }
 
   mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 10000, // Wait 10s for connection
+    serverSelectionTimeoutMS: 15000, 
   })
     .then(async () => {
       console.log('MongoDB Connected to:', mongoose.connection.name);
-      
-      // Auto-Seed: Create admin if database is empty
+      lastError = null;
       try {
         const userCount = await User.countDocuments();
         if (userCount === 0) {
-          console.log('Database is empty. Creating initial admin user...');
           const adminEmail = process.env.ADMIN_EMAIL;
           const adminPassword = process.env.ADMIN_PASSWORD;
-          
           if (adminEmail && adminPassword) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(adminPassword, salt);
-            
-            const admin = new User({
-              email: adminEmail,
-              password: hashedPassword,
-              name: 'Rudranil Koley',
-              roleTitles: ['Data Analyst']
-            });
+            const admin = new User({ email: adminEmail, password: hashedPassword, name: 'Rudranil Koley', roleTitles: ['Data Analyst'] });
             await admin.save();
-            console.log('Initial Admin user created successfully.');
-          } else {
-            console.warn('Could not auto-seed: ADMIN_EMAIL or ADMIN_PASSWORD missing from env.');
+            console.log('Initial Admin user created.');
           }
         }
-      } catch (err) {
-        console.error('Auto-seed check failed:', err.message);
-      }
+      } catch (err) {}
     })
     .catch(err => {
       console.error('MongoDB Connection Error:', err.message);
+      lastError = err.message;
     });
 }
 
@@ -77,6 +67,7 @@ app.get('/', (req, res) => {
               mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
     dbName: mongoose.connection.name,
     uriPresent: !!MONGODB_URI,
+    lastError: lastError,
     environment: process.env.NODE_ENV || 'production'
   });
 });
