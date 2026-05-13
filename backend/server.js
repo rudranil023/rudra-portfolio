@@ -5,6 +5,12 @@ import cors from 'cors';
 import path from 'path';
 import bcrypt from 'bcrypt';
 import User from './models/User.js';
+import { authRoutes } from './routes/auth.js';
+import { projectRoutes } from './routes/projects.js';
+import { certificationRoutes } from './routes/certifications.js';
+import { messageRoutes } from './routes/messages.js';
+import { skillRoutes } from './routes/skills.js';
+import { settingRoutes } from './routes/settings.js';
 
 // Load env vars
 dotenv.config();
@@ -76,36 +82,11 @@ async function connectToDatabase() {
   }
 }
 
-// Basic route
-app.get('/', async (req, res) => {
-  try {
-    await connectToDatabase();
-  } catch (err) {
-    // We still return JSON even if DB fails
-  }
-
-  res.json({
-    message: 'Portfolio API is running',
-    dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 
-              mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
-    dbName: mongoose.connection.name,
-    uriPresent: !!MONGODB_URI,
-    uriLength: MONGODB_URI ? MONGODB_URI.length : 0,
-    lastError: lastError,
-    nodeVersion: process.version
-  });
+// Debug Middleware
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.path}`);
+  next();
 });
-
-app.get('/favicon.ico', (req, res) => res.status(204).end());
-app.get('/favicon.png', (req, res) => res.status(204).end());
-
-// Import Routes
-import { authRoutes } from './routes/auth.js';
-import { projectRoutes } from './routes/projects.js';
-import { certificationRoutes } from './routes/certifications.js';
-import { messageRoutes } from './routes/messages.js';
-import { skillRoutes } from './routes/skills.js';
-import { settingRoutes } from './routes/settings.js';
 
 // Database Middleware
 app.use(async (req, res, next) => {
@@ -118,13 +99,32 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Routes
+// Routes - MOVED TO TOP
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/certifications', certificationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/settings', settingRoutes);
+
+// Basic route
+app.get('/', async (req, res) => {
+  try {
+    await connectToDatabase();
+  } catch (err) {}
+
+  res.json({
+    message: 'Portfolio API is running',
+    dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 
+              mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
+    dbName: mongoose.connection.name,
+    uriPresent: !!MONGODB_URI,
+    uriLength: MONGODB_URI ? MONGODB_URI.length : 0,
+    lastError: lastError,
+    nodeVersion: process.version,
+    pathHit: req.path
+  });
+});
 
 // Export app for Vercel
 export default app;
