@@ -236,13 +236,24 @@ const AdminDashboard = () => {
       <style>{`
         @keyframes grid-move {
           0% { transform: translateY(0); }
-          100% { transform: translateY(40px); }
+          100% { transform: translateY(60px); }
+        }
+        @keyframes breathing-glow {
+          0%, 100% { transform: scale(1); opacity: 0.08; filter: blur(120px); }
+          50% { transform: scale(1.4); opacity: 0.18; filter: blur(180px); }
+        }
+        .breathing-glow-1 {
+          animation: breathing-glow 10s ease-in-out infinite;
+        }
+        .breathing-glow-2 {
+          animation: breathing-glow 15s ease-in-out infinite;
+          animation-delay: -5s;
         }
         .cyber-grid {
-          background-image: linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
-          background-size: 40px 40px;
-          animation: grid-move 4s linear infinite;
+          background-image: linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+          background-size: 60px 60px;
+          animation: grid-move 10s linear infinite;
         }
         .tab-hover-effect {
           position: relative;
@@ -266,9 +277,9 @@ const AdminDashboard = () => {
 
       {/* Cyber Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 cyber-grid opacity-20"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute inset-0 cyber-grid opacity-30"></div>
+        <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-primary rounded-full breathing-glow-1"></div>
+        <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] bg-accent rounded-full breathing-glow-2"></div>
       </div>
 
       {/* Sidebar */}
