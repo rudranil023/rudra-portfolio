@@ -99,13 +99,20 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Routes - MOVED TO TOP
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/certifications', certificationRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/skills', skillRoutes);
-app.use('/api/settings', settingRoutes);
+// Routes - Support both with and without /api prefix
+const routes = [
+  { path: '/auth', handler: authRoutes },
+  { path: '/projects', handler: projectRoutes },
+  { path: '/certifications', handler: certificationRoutes },
+  { path: '/messages', handler: messageRoutes },
+  { path: '/skills', handler: skillRoutes },
+  { path: '/settings', handler: settingRoutes }
+];
+
+routes.forEach(route => {
+  app.use(route.path, route.handler);       // e.g. /auth/login
+  app.use(`/api${route.path}`, route.handler); // e.g. /api/auth/login
+});
 
 // Basic route
 app.get('/', async (req, res) => {
