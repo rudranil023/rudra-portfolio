@@ -107,29 +107,24 @@ import { messageRoutes } from './routes/messages.js';
 import { skillRoutes } from './routes/skills.js';
 import { settingRoutes } from './routes/settings.js';
 
-const router = express.Router();
-
-router.use('/auth', authRoutes);
-router.use('/projects', projectRoutes);
-router.use('/certifications', certificationRoutes);
-router.use('/messages', messageRoutes);
-router.use('/skills', skillRoutes);
-router.use('/settings', settingRoutes);
-
-const dbMiddleware = async (req, res, next) => {
+// Database Middleware
+app.use(async (req, res, next) => {
   try {
     await connectToDatabase();
     next();
   } catch (err) {
-    // If it's a favicon or root, we don't want to error out the whole request
-    if (req.path === '/' || req.path.includes('favicon')) {
-      return next();
-    }
-    res.status(503).json({ error: 'Database connection failed', details: err.message });
+    if (req.path === '/' || req.path.includes('favicon')) return next();
+    res.status(503).json({ error: 'Database connection failed' });
   }
-};
+});
 
-app.use('/api', dbMiddleware, router);
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/certifications', certificationRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/settings', settingRoutes);
 
-// Export app for serverless
+// Export app for Vercel
 export default app;
