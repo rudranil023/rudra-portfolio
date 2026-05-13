@@ -255,6 +255,15 @@ const AdminDashboard = () => {
           background-size: 60px 60px;
           animation: grid-move 10s linear infinite;
         }
+        @keyframes card-breathe {
+          0%, 100% { border-color: rgba(255,255,255,0.05); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+          50% { border-color: var(--card-glow); box-shadow: 0 0 40px var(--card-glow-soft); }
+        }
+        .card-indigo { --card-glow: rgba(99, 102, 241, 0.4); --card-glow-soft: rgba(99, 102, 241, 0.15); animation: card-breathe 4s ease-in-out infinite; }
+        .card-purple { --card-glow: rgba(168, 85, 247, 0.4); --card-glow-soft: rgba(168, 85, 247, 0.15); animation: card-breathe 4s ease-in-out infinite; animation-delay: 1s; }
+        .card-green { --card-glow: rgba(16, 185, 129, 0.4); --card-glow-soft: rgba(16, 185, 129, 0.15); animation: card-breathe 4s ease-in-out infinite; animation-delay: 2s; }
+        .card-amber { --card-glow: rgba(245, 158, 11, 0.4); --card-glow-soft: rgba(245, 158, 11, 0.15); animation: card-breathe 4s ease-in-out infinite; animation-delay: 3s; }
+        
         .tab-hover-effect {
           position: relative;
           overflow: hidden;
@@ -371,22 +380,22 @@ const AdminDashboard = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { label: 'Deployed Projects', value: projects.length, icon: FileCode2, color: '#6366f1', glow: 'shadow-[0_0_25px_rgba(99,102,241,0.2)]' },
-                  { label: 'Validated Certs', value: certifications.length, icon: Award, color: '#a855f7', glow: 'shadow-[0_0_25px_rgba(168,85,247,0.2)]' },
-                  { label: 'Skills Node', value: skills.length, icon: Code2, color: '#10b981', glow: 'shadow-[0_0_25px_rgba(16,185,129,0.2)]' },
-                  { label: 'Comms Inbox', value: messages.length, icon: MessageSquare, color: '#f59e0b', glow: 'shadow-[0_0_25px_rgba(245,158,11,0.2)]' }
+                  { label: 'Deployed Projects', value: projects.length, icon: FileCode2, color: '#6366f1', glowClass: 'card-indigo' },
+                  { label: 'Validated Certs', value: certifications.length, icon: Award, color: '#a855f7', glowClass: 'card-purple' },
+                  { label: 'Skills Node', value: skills.length, icon: Code2, color: '#10b981', glowClass: 'card-green' },
+                  { label: 'Comms Inbox', value: messages.length, icon: MessageSquare, color: '#f59e0b', glowClass: 'card-amber' }
                 ].map((stat, i) => (
-                  <div key={i} className={`bg-dark/30 backdrop-blur-2xl p-7 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:border-white/10 transition-all duration-500 ${stat.glow}`}>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
-                    <div className="relative z-10 flex flex-col gap-4">
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner" style={{ backgroundColor: `${stat.color}15`, color: stat.color, border: `1px solid ${stat.color}30` }}>
+                  <div key={i} className={`bg-dark/40 backdrop-blur-3xl p-7 rounded-[2.5rem] border border-white/5 relative overflow-hidden group hover:scale-[1.03] transition-all duration-700 ${stat.glowClass}`}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700"></div>
+                    <div className="relative z-10 flex flex-col gap-5">
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]" style={{ backgroundColor: `${stat.color}20`, color: stat.color, border: `1px solid ${stat.color}40` }}>
                         <stat.icon size={28} />
                       </div>
                       <div>
-                        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.25em] mb-1">{stat.label}</p>
                         <div className="flex items-end gap-2">
-                          <p className="text-4xl font-black text-white leading-none">{stat.value}</p>
-                          <span className="text-[10px] font-black text-gray-400 mb-1">UNIT</span>
+                          <p className="text-5xl font-black text-white leading-none tracking-tighter">{stat.value}</p>
+                          <span className="text-[10px] font-black text-primary/60 mb-1">UNIT</span>
                         </div>
                       </div>
                     </div>
