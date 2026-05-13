@@ -28,8 +28,10 @@ const Certifications = ({ certifications }) => {
                 className="glass-card flex flex-col items-center text-center hover:border-primary/50 transition-colors"
               >
                 <div className="w-16 h-16 rounded-full bg-dark border-2 border-white/10 flex items-center justify-center mb-4 overflow-hidden shadow-lg shadow-primary/20">
-                  {cert.image ? (
-                     <img src={`${IMAGE_BASE_URL}${cert.image}`} alt={cert.title} className="w-full h-full object-cover" />
+                  {cert.images && cert.images.length > 0 ? (
+                     <img src={cert.images[0]} alt={cert.title} className="w-full h-full object-cover" />
+                  ) : cert.image ? (
+                     <img src={cert.image.startsWith('data:') ? cert.image : `${IMAGE_BASE_URL}${cert.image}`} alt={cert.title} className="w-full h-full object-cover" />
                   ) : (
                      <Award className="text-accent" size={30} />
                   )}

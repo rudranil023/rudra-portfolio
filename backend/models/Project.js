@@ -6,7 +6,7 @@ const projectSchema = new mongoose.Schema({
   technologies: { type: [String], required: true },
   githubLink: { type: String },
   liveLink: { type: String },
-  image: { type: String }, // Path to the uploaded image
+  images: { type: [String], default: [] }, // Array of Base64 image strings
 }, { timestamps: true });
 
 export default mongoose.model('Project', projectSchema);

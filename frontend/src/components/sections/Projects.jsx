@@ -32,7 +32,7 @@ const Projects = ({ projects }) => {
                 <div className="relative h-48 -mt-6 -mx-6 mb-6 overflow-hidden bg-dark">
                   <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors z-10"></div>
                   <img 
-                    src={project.image ? `${IMAGE_BASE_URL}${project.image}` : ''} 
+                    src={(project.images && project.images.length > 0) ? project.images[0] : (project.image && project.image.startsWith('data:')) ? project.image : project.image ? `${IMAGE_BASE_URL}${project.image}` : ''} 
                     alt={project.title} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

@@ -18,10 +18,26 @@ router.get('/', async (req, res) => {
 });
 
 // Create a project
-router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, upload.array('images', 5), async (req, res) => {
   try {
     const { title, description, technologies, githubLink, liveLink } = req.body;
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageDataArray = [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        // Read file and convert to base64
+        const fileBuffer = fs.readFileSync(file.path);
+        const base64Image = fileBuffer.toString('base64');
+        imageDataArray.push(`data:${file.mimetype};base64,${base64Image}`);
+        
+        // Cleanup temp file
+        try {
+          fs.unlinkSync(file.path);
+        } catch (err) {
+          console.error('Error deleting temp file:', err);
+        }
+      }
+    }
 
     const newProject = new Project({
       title,
@@ -29,13 +45,14 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       technologies: technologies ? technologies.split(',').map(tech => tech.trim()) : [],
       githubLink,
       liveLink,
-      image: imagePath,
+      images: imageDataArray, // Now stores array of base64 strings
     });
 
     const savedProject = await newProject.save();
     res.status(201).json(savedProject);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Project creation error:', error);
+    res.status(500).json({ message: 'Server error', details: error.message });
   }
 });
 

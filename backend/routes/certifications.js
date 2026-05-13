@@ -18,22 +18,37 @@ router.get('/', async (req, res) => {
 });
 
 // Create a certification
-router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, upload.array('images', 5), async (req, res) => {
   try {
     const { title, issuer, date } = req.body;
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageDataArray = [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const fileBuffer = fs.readFileSync(file.path);
+        const base64Image = fileBuffer.toString('base64');
+        imageDataArray.push(`data:${file.mimetype};base64,${base64Image}`);
+        
+        try {
+          fs.unlinkSync(file.path);
+        } catch (err) {
+          console.error('Error deleting temp file:', err);
+        }
+      }
+    }
 
     const newCert = new Certification({
       title,
       issuer,
       date,
-      image: imagePath,
+      images: imageDataArray,
     });
 
     const savedCert = await newCert.save();
     res.status(201).json(savedCert);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Cert creation error:', error);
+    res.status(500).json({ message: 'Server error', details: error.message });
   }
 });
 

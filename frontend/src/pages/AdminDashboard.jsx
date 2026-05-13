@@ -4,6 +4,10 @@ import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, FileCode2, Award, MessageSquare, LogOut, Plus, Trash2, Settings as SettingsIcon, UserCircle, Code2, FileText, Upload } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, BarChart, Bar, Legend 
+} from 'recharts';
 
 const AdminDashboard = () => {
   const { user, loading, logout } = useContext(AuthContext);
@@ -19,8 +23,8 @@ const AdminDashboard = () => {
   const [profile, setProfile] = useState({ name: '', bio: '', roleTitles: '', phone: '', address: '', linkedin: '', github: '', twitter: '', instagram: '' });
 
   // Form States
-  const [newProject, setNewProject] = useState({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', image: null });
-  const [newCert, setNewCert] = useState({ title: '', issuer: '', date: '', image: null });
+  const [newProject, setNewProject] = useState({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', images: [] });
+  const [newCert, setNewCert] = useState({ title: '', issuer: '', date: '', images: [] });
   const [newSkill, setNewSkill] = useState({ name: '', percentage: '', icon: '' });
 
   useEffect(() => {
@@ -66,6 +70,30 @@ const AdminDashboard = () => {
     }
   };
 
+  // --- Chart Data Processing ---
+  const skillChartData = skills.map(s => ({ name: s.name, value: parseInt(s.percentage) || 0 }));
+  
+  const techUsage = {};
+  projects.forEach(p => {
+    p.technologies?.forEach(t => {
+      techUsage[t] = (techUsage[t] || 0) + 1;
+    });
+  });
+  const techChartData = Object.entries(techUsage)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  const messageTrendData = messages.reduce((acc, msg) => {
+    const date = new Date(msg.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const existing = acc.find(item => item.date === date);
+    if (existing) existing.count += 1;
+    else acc.push({ date, count: 1 });
+    return acc;
+  }, []).slice(-7);
+
+  const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4'];
+
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
@@ -82,15 +110,35 @@ const AdminDashboard = () => {
     };
   };
 
+  const moveImage = (type, index, direction) => {
+    const state = type === 'project' ? newProject : newCert;
+    const setState = type === 'project' ? setNewProject : setNewCert;
+    const newImages = [...state.images];
+    
+    if (direction === 'up' && index > 0) {
+      [newImages[index], newImages[index - 1]] = [newImages[index - 1], newImages[index]];
+    } else if (direction === 'down' && index < newImages.length - 1) {
+      [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+    }
+    
+    setState({ ...state, images: newImages });
+  };
+
   // --- Handlers ---
   const handleAddProject = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    Object.keys(newProject).forEach(key => formData.append(key, newProject[key]));
+    Object.keys(newProject).forEach(key => {
+      if (key === 'images') {
+        newProject.images.forEach(file => formData.append('images', file));
+      } else {
+        formData.append(key, newProject[key]);
+      }
+    });
     try {
       await axios.post(`${API_BASE_URL}/projects`, formData, getConfig(true));
       fetchData();
-      setNewProject({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', image: null });
+      setNewProject({ title: '', description: '', technologies: '', githubLink: '', liveLink: '', images: [] });
     } catch (error) { console.error(error); }
   };
 
@@ -104,11 +152,17 @@ const AdminDashboard = () => {
   const handleAddCert = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    Object.keys(newCert).forEach(key => formData.append(key, newCert[key]));
+    Object.keys(newCert).forEach(key => {
+      if (key === 'images') {
+        newCert.images.forEach(file => formData.append('images', file));
+      } else {
+        formData.append(key, newCert[key]);
+      }
+    });
     try {
       await axios.post(`${API_BASE_URL}/certifications`, formData, getConfig(true));
       fetchData();
-      setNewCert({ title: '', issuer: '', date: '', image: null });
+      setNewCert({ title: '', issuer: '', date: '', images: [] });
     } catch (error) { console.error(error); }
   };
 
@@ -243,25 +297,133 @@ const AdminDashboard = () => {
         <div className="max-w-6xl mx-auto">
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              <h2 className="text-3xl font-bold mb-8">Welcome back, {user.name?.split(' ')[0] || 'Admin'} 👋</h2>
+            <div className="space-y-8 animate-fade-in pb-10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-white tracking-tight">System Overview</h2>
+                  <p className="text-gray-400 mt-1">Real-time analytics and portfolio performance</p>
+                </div>
+                <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  <span className="text-xs font-medium text-gray-300">Database Live</span>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { label: 'Total Projects', value: projects.length, icon: FileCode2, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-                  { label: 'Certifications', value: certifications.length, icon: Award, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-                  { label: 'Skills Added', value: skills.length, icon: Code2, color: 'text-green-400', bg: 'bg-green-400/10' },
-                  { label: 'Unread Messages', value: messages.length, icon: MessageSquare, color: 'text-amber-400', bg: 'bg-amber-400/10' }
+                  { label: 'Projects', value: projects.length, icon: FileCode2, color: '#6366f1', trend: '+12%' },
+                  { label: 'Certs', value: certifications.length, icon: Award, color: '#a855f7', trend: '+5%' },
+                  { label: 'Skills', value: skills.length, icon: Code2, color: '#10b981', trend: 'Active' },
+                  { label: 'Messages', value: messages.length, icon: MessageSquare, color: '#f59e0b', trend: 'New' }
                 ].map((stat, i) => (
-                  <div key={i} className="glass-card p-6 flex items-center justify-between hover:scale-[1.02] transition-transform cursor-default">
-                    <div>
-                      <p className="text-gray-400 text-sm font-medium mb-1">{stat.label}</p>
-                      <p className="text-3xl font-bold text-white">{stat.value}</p>
-                    </div>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
-                      <stat.icon size={24} />
+                  <div key={i} className="glass-card p-6 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="relative z-10 flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">{stat.label}</p>
+                        <p className="text-3xl font-bold text-white">{stat.value}</p>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-gray-400 mt-2 inline-block">{stat.trend}</span>
+                      </div>
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{ backgroundColor: `${stat.color}20`, color: stat.color }}>
+                        <stat.icon size={24} />
+                      </div>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Charts Row 1 */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Message Trends */}
+                <div className="lg:col-span-2 glass-card p-6">
+                  <h3 className="text-lg font-bold text-white mb-6">Inquiry Traffic</h3>
+                  <div className="h-72 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={messageTrendData.length > 0 ? messageTrendData : [{date: 'No Data', count: 0}]}>
+                        <defs>
+                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                        <XAxis dataKey="date" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
+                          itemStyle={{ color: '#6366f1' }}
+                        />
+                        <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Skills Distribution */}
+                <div className="glass-card p-6">
+                  <h3 className="text-lg font-bold text-white mb-6">Skills Mastery</h3>
+                  <div className="h-72 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={skillChartData.length > 0 ? skillChartData : [{name: 'Empty', value: 100}]}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {(skillChartData.length > 0 ? skillChartData : [1]).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                           contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
+                        />
+                        <Legend verticalAlign="bottom" height={36}/>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              {/* Charts Row 2 */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Tech Stack usage */}
+                <div className="glass-card p-6">
+                  <h3 className="text-lg font-bold text-white mb-6">Top Technologies</h3>
+                  <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={techChartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                        <XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                          cursor={{fill: '#ffffff05'}}
+                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
+                        />
+                        <Bar dataKey="count" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Quick Actions / Recent Message */}
+                <div className="glass-card p-6 flex flex-col justify-center text-center">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
+                    <SettingsIcon size={40} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Portfolio Settings</h3>
+                  <p className="text-gray-400 text-sm mb-6">Manage your SEO, theme, and site-wide configurations from one place.</p>
+                  <button 
+                    onClick={() => setActiveTab('settings')}
+                    className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors font-bold text-sm"
+                  >
+                    Configure Site
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -300,16 +462,41 @@ const AdminDashboard = () => {
                     <textarea required value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} className="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-white h-28 resize-none focus:border-primary outline-none transition-colors" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-2">Project Thumbnail</label>
-                    <div className="flex items-center justify-center w-full">
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-white/10 border-dashed rounded-lg cursor-pointer bg-dark/20 hover:bg-dark/50 transition-colors">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                                <p className="mb-2 text-sm text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                {newProject.image && <p className="text-xs text-primary font-medium">{newProject.image.name}</p>}
+                    <label className="block text-xs font-medium text-gray-400 mb-2">Project Images (Up to 5 - Arrange below)</label>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-center w-full">
+                          <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-white/10 border-dashed rounded-lg cursor-pointer bg-dark/20 hover:bg-dark/50 transition-colors">
+                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                  <Upload className="w-6 h-6 mb-2 text-gray-400" />
+                                  <p className="text-xs text-gray-400"><span className="font-semibold">Click to upload up to 5 images</span></p>
+                              </div>
+                              <input type="file" multiple className="hidden" onChange={e => {
+                                const files = Array.from(e.target.files).slice(0, 5);
+                                setNewProject({...newProject, images: files});
+                              }} />
+                          </label>
+                      </div>
+
+                      {/* Image Arranger */}
+                      {newProject.images.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                          {newProject.images.map((file, idx) => (
+                            <div key={idx} className="relative group bg-white/5 rounded-lg p-2 border border-white/10">
+                              <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-16 object-cover rounded" />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                <button type="button" onClick={() => moveImage('project', idx, 'up')} className="p-1 hover:text-primary"><Plus className="rotate-[-135deg]" size={14} /></button>
+                                <button type="button" onClick={() => moveImage('project', idx, 'down')} className="p-1 hover:text-primary"><Plus className="rotate-[45deg]" size={14} /></button>
+                                <button type="button" onClick={() => {
+                                  const newImgs = [...newProject.images];
+                                  newImgs.splice(idx, 1);
+                                  setNewProject({...newProject, images: newImgs});
+                                }} className="p-1 hover:text-red-400"><Trash2 size={14} /></button>
+                              </div>
+                              <div className="absolute -top-2 -left-2 w-5 h-5 bg-primary rounded-full text-[10px] flex items-center justify-center font-bold">{idx + 1}</div>
                             </div>
-                            <input type="file" className="hidden" onChange={e => setNewProject({...newProject, image: e.target.files[0]})} />
-                        </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-end pt-2">
@@ -374,8 +561,34 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-2">Certificate Image</label>
-                    <input type="file" onChange={e => setNewCert({...newCert, image: e.target.files[0]})} className="w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors" />
+                    <label className="block text-xs font-medium text-gray-400 mb-2">Certificate Images (Up to 5 - Arrange below)</label>
+                    <div className="space-y-4">
+                      <input type="file" multiple onChange={e => {
+                        const files = Array.from(e.target.files).slice(0, 5);
+                        setNewCert({...newCert, images: files});
+                      }} className="w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 transition-colors" />
+                      
+                      {/* Image Arranger */}
+                      {newCert.images.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                          {newCert.images.map((file, idx) => (
+                            <div key={idx} className="relative group bg-white/5 rounded-lg p-2 border border-white/10">
+                              <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-16 object-cover rounded" />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                <button type="button" onClick={() => moveImage('cert', idx, 'up')} className="p-1 hover:text-primary"><Plus className="rotate-[-135deg]" size={14} /></button>
+                                <button type="button" onClick={() => moveImage('cert', idx, 'down')} className="p-1 hover:text-primary"><Plus className="rotate-[45deg]" size={14} /></button>
+                                <button type="button" onClick={() => {
+                                  const newImgs = [...newCert.images];
+                                  newImgs.splice(idx, 1);
+                                  setNewCert({...newCert, images: newImgs});
+                                }} className="p-1 hover:text-red-400"><Trash2 size={14} /></button>
+                              </div>
+                              <div className="absolute -top-2 -left-2 w-5 h-5 bg-primary rounded-full text-[10px] flex items-center justify-center font-bold">{idx + 1}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="flex justify-end pt-2">
                     <button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-primary/20">Save Certification</button>
