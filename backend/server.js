@@ -46,17 +46,26 @@ async function connectToDatabase() {
     lastError = null;
     console.log('MongoDB Connected successfully');
 
-    // Auto-seed check
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
-      const adminEmail = process.env.ADMIN_EMAIL;
+    // Smart-Seed: Create admin if this specific email doesn't exist
+    const adminEmail = process.env.ADMIN_EMAIL || 'rudranilkoley64@gmail.com';
+    const existingAdmin = await User.findOne({ email: adminEmail });
+    
+    if (!existingAdmin) {
+      console.log('Admin not found. Creating initial admin user...');
       const adminPassword = process.env.ADMIN_PASSWORD;
-      if (adminEmail && adminPassword) {
+      if (adminPassword) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(adminPassword, salt);
-        const admin = new User({ email: adminEmail, password: hashedPassword, name: 'Rudranil Koley', roleTitles: ['Data Analyst'] });
+        const admin = new User({ 
+          email: adminEmail, 
+          password: hashedPassword, 
+          name: 'Rudranil Koley', 
+          roleTitles: ['Data Analyst'] 
+        });
         await admin.save();
-        console.log('Admin seeded.');
+        console.log('Admin account created successfully.');
+      } else {
+        console.warn('Could not seed: ADMIN_PASSWORD missing from env.');
       }
     }
     return cachedDb;
