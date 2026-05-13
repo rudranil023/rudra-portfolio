@@ -1,6 +1,6 @@
 import express from 'express';
 import Skill from '../models/Skill.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 

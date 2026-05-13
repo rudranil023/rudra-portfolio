@@ -1,7 +1,7 @@
 import express from 'express';
 import Certification from '../models/Certification.js';
-import authMiddleware from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { upload } from '../middleware/uploadMiddleware.js';
 import fs from 'fs';
 import path from 'path';
 

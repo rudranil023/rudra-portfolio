@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 import User from '../models/User.js';
-import authMiddleware from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { upload } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 

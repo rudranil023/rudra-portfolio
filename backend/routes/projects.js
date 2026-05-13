@@ -1,7 +1,7 @@
 import express from 'express';
 import Project from '../models/Project.js';
-import authMiddleware from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { upload } from '../middleware/uploadMiddleware.js';
 import fs from 'fs';
 import path from 'path';
 
