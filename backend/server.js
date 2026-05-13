@@ -22,43 +22,59 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // DB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
+let cachedDb = null;
 let lastError = null;
 
-if (!MONGODB_URI) {
-  console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
-} else {
-  mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 30000, // Wait 30s
-    dbName: 'protfolio',
-    socketTimeoutMS: 45000,
-  })
-    .then(async () => {
-      console.log('MongoDB Connected to:', mongoose.connection.name);
-      lastError = null;
-      // Auto-Seed logic...
-      try {
-        const userCount = await User.countDocuments();
-        if (userCount === 0) {
-          const adminEmail = process.env.ADMIN_EMAIL;
-          const adminPassword = process.env.ADMIN_PASSWORD;
-          if (adminEmail && adminPassword) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(adminPassword, salt);
-            const admin = new User({ email: adminEmail, password: hashedPassword, name: 'Rudranil Koley', roleTitles: ['Data Analyst'] });
-            await admin.save();
-            console.log('Initial Admin user created.');
-          }
-        }
-      } catch (err) {}
-    })
-    .catch(err => {
-      console.error('MongoDB Connection Error:', err.message);
-      lastError = err.message;
+async function connectToDatabase() {
+  if (cachedDb && mongoose.connection.readyState === 1) {
+    return cachedDb;
+  }
+
+  if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI is missing');
+  }
+
+  try {
+    console.log('Connecting to MongoDB...');
+    const conn = await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 20000,
+      connectTimeoutMS: 20000,
+      dbName: 'protfolio',
     });
+    
+    cachedDb = conn;
+    lastError = null;
+    console.log('MongoDB Connected successfully');
+
+    // Auto-seed check
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      if (adminEmail && adminPassword) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminPassword, salt);
+        const admin = new User({ email: adminEmail, password: hashedPassword, name: 'Rudranil Koley', roleTitles: ['Data Analyst'] });
+        await admin.save();
+        console.log('Admin seeded.');
+      }
+    }
+    return cachedDb;
+  } catch (err) {
+    lastError = err.message;
+    console.error('Connection error:', err.message);
+    throw err;
+  }
 }
 
 // Basic route
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  try {
+    await connectToDatabase();
+  } catch (err) {
+    // We still return JSON even if DB fails
+  }
+
   res.json({
     message: 'Portfolio API is running',
     dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 
@@ -95,8 +111,21 @@ router.use('/messages', messageRoutes);
 router.use('/skills', skillRoutes);
 router.use('/settings', settingRoutes);
 
-app.use('/api', router);
-app.use('/.netlify/functions/api', router);
+const dbMiddleware = async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (err) {
+    // If it's a favicon or root, we don't want to error out the whole request
+    if (req.path === '/' || req.path.includes('favicon')) {
+      return next();
+    }
+    res.status(503).json({ error: 'Database connection failed', details: err.message });
+  }
+};
+
+app.use('/api', dbMiddleware, router);
+app.use('/.netlify/functions/api', dbMiddleware, router);
 
 // Export app for serverless
 export default app;
