@@ -27,17 +27,15 @@ let lastError = null;
 if (!MONGODB_URI) {
   console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
 } else {
-  // Check if URI includes the database name from your screenshot
-  if (!MONGODB_URI.includes('/protfolio')) {
-    console.warn('WARNING: Your MONGODB_URI might be missing the "/protfolio" database name found in your Atlas screenshot.');
-  }
-
   mongoose.connect(MONGODB_URI, {
-    serverSelectionTimeoutMS: 15000, 
+    serverSelectionTimeoutMS: 30000, // Wait 30s
+    dbName: 'protfolio',
+    socketTimeoutMS: 45000,
   })
     .then(async () => {
       console.log('MongoDB Connected to:', mongoose.connection.name);
       lastError = null;
+      // Auto-Seed logic...
       try {
         const userCount = await User.countDocuments();
         if (userCount === 0) {
@@ -67,8 +65,9 @@ app.get('/', (req, res) => {
               mongoose.connection.readyState === 2 ? 'Connecting' : 'Disconnected',
     dbName: mongoose.connection.name,
     uriPresent: !!MONGODB_URI,
+    uriLength: MONGODB_URI ? MONGODB_URI.length : 0,
     lastError: lastError,
-    environment: process.env.NODE_ENV || 'production'
+    nodeVersion: process.version
   });
 });
 
