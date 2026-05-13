@@ -20,13 +20,21 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // DB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log('MongoDB Connection Error:', err));
+if (!MONGODB_URI) {
+  console.error('CRITICAL: MONGODB_URI is not defined in environment variables!');
+} else {
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.error('MongoDB Connection Error:', err));
+}
 
 // Basic route
 app.get('/', (req, res) => {
-  res.send('Portfolio API is running');
+  res.json({
+    message: 'Portfolio API is running',
+    dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    environment: process.env.NODE_ENV || 'production'
+  });
 });
 
 app.get('/.netlify/functions/api', (req, res) => {

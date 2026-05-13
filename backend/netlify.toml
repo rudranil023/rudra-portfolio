@@ -3,6 +3,9 @@
   functions = "netlify/functions"
   publish = "."
 
+[build.environment]
+  SECRETS_SCAN_ENABLED = "true" # You can set this to "false" if the secret scanner keeps blocking you incorrectly
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
