@@ -225,108 +225,158 @@ const AdminDashboard = () => {
   const TabButton = ({ id, icon: Icon, label }) => (
     <button 
       onClick={() => setActiveTab(id)}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === id ? 'bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 tab-hover-effect group ${activeTab === id ? 'bg-gradient-to-r from-primary/20 to-accent/20 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] border border-primary/40' : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'}`}
     >
-      <Icon size={18} /> {label}
+      <Icon size={18} className={activeTab === id ? 'text-primary' : 'text-gray-600 group-hover:text-primary transition-colors'} /> {label}
     </button>
   );
 
   return (
-    <div className="min-h-screen flex bg-dark text-white font-sans selection:bg-primary/30">
+    <div className="min-h-screen flex bg-[#020205] text-white font-sans selection:bg-primary/30 relative overflow-hidden">
+      <style>{`
+        @keyframes grid-move {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(40px); }
+        }
+        .cyber-grid {
+          background-image: linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+          background-size: 40px 40px;
+          animation: grid-move 4s linear infinite;
+        }
+        .tab-hover-effect {
+          position: relative;
+          overflow: hidden;
+        }
+        .tab-hover-effect::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+          transform: translateX(-100%);
+          transition: transform 0.6s;
+        }
+        .tab-hover-effect:hover::after {
+          transform: translateX(100%);
+        }
+      `}</style>
+
+      {/* Cyber Background Elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 cyber-grid opacity-20"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
       {/* Sidebar */}
-      <div className="w-64 bg-dark border-r border-white/5 p-6 flex-col hidden md:flex sticky top-0 h-screen overflow-y-auto">
-        <div className="mb-10 px-2">
-          <h2 className="text-2xl font-bold text-white tracking-tighter flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm">RK</span>
-            Admin<span className="text-primary font-light">Panel</span>
+      <div className="w-72 bg-dark/40 backdrop-blur-xl border-r border-white/5 p-6 flex-col hidden md:flex sticky top-0 h-screen z-20 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
+        <div className="mb-12 px-2">
+          <h2 className="text-2xl font-black text-white tracking-tighter flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-indigo-500 to-accent flex items-center justify-center text-sm shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:rotate-12 transition-transform duration-300">
+              <span className="text-white font-bold">RK</span>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-lg">ADMIN</span>
+              <span className="text-[10px] text-primary font-bold tracking-[0.2em]">CONTROL</span>
+            </div>
           </h2>
         </div>
         
-        <nav className="flex-1 space-y-1.5">
+        <nav className="flex-1 space-y-2">
           <TabButton id="dashboard" icon={LayoutDashboard} label="Dashboard" />
-          <div className="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</div>
+          <div className="pt-6 pb-2 px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Content Engine</div>
           <TabButton id="projects" icon={FileCode2} label="Projects" />
           <TabButton id="certifications" icon={Award} label="Certifications" />
           <TabButton id="skills" icon={Code2} label="Skills" />
           <TabButton id="resume" icon={FileText} label="Resume" />
           
-          <div className="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">System</div>
+          <div className="pt-6 pb-2 px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Neural Link</div>
           <TabButton id="messages" icon={MessageSquare} label="Messages" />
           <TabButton id="profile" icon={UserCircle} label="Profile" />
           <TabButton id="settings" icon={SettingsIcon} label="Settings" />
         </nav>
         
         <div className="mt-8 pt-6 border-t border-white/5">
-          <div className="flex items-center gap-3 px-4 mb-6">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">{user.name?.charAt(0) || 'A'}</div>
-            <div>
-              <p className="text-sm font-medium text-white">{user.name || 'Admin'}</p>
-              <p className="text-xs text-gray-500">{user.email}</p>
+          <div className="flex items-center gap-3 px-4 mb-8 bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20">
+              {user.name?.charAt(0) || 'A'}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-bold text-white truncate">{user.name || 'Administrator'}</p>
+              <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-400 border border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40 transition-all duration-300"
           >
-            <LogOut size={16} /> Log out
+            <LogOut size={16} /> TERMINATE SESSION
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 lg:p-12 overflow-y-auto bg-gradient-to-br from-dark to-[#0f0f0f]">
+      <div className="flex-1 p-8 lg:p-12 overflow-y-auto relative z-10 scrollbar-hide">
         
         {/* Mobile Header */}
-        <header className="flex justify-between items-center mb-8 pb-4 border-b border-white/10 md:hidden">
-            <h2 className="text-xl font-bold text-white">Admin Panel</h2>
+        <header className="flex justify-between items-center mb-12 pb-6 border-b border-white/5 md:hidden">
+            <h2 className="text-xl font-black text-white">ADMIN <span className="text-primary">CORE</span></h2>
             <select 
                 value={activeTab} 
                 onChange={(e) => setActiveTab(e.target.value)}
-                className="bg-dark border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:ring-1 focus:ring-primary outline-none"
+                className="bg-dark/80 border border-white/10 rounded-xl px-4 py-2 text-white text-xs font-bold focus:ring-2 focus:ring-primary outline-none backdrop-blur-md"
             >
-                <option value="dashboard">Dashboard</option>
-                <option value="projects">Projects</option>
-                <option value="certifications">Certifications</option>
-                <option value="skills">Skills</option>
-                <option value="profile">Profile</option>
-                <option value="settings">Settings</option>
-                <option value="messages">Messages</option>
+                <option value="dashboard">SYSTEM OVERVIEW</option>
+                <option value="projects">PROJECTS ENGINE</option>
+                <option value="certifications">CERTIFICATION HUB</option>
+                <option value="skills">NEURAL SKILLS</option>
+                <option value="profile">USER PROFILE</option>
+                <option value="settings">CORE SETTINGS</option>
+                <option value="messages">COMMUNICATION</option>
             </select>
         </header>
 
         <div className="max-w-6xl mx-auto">
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-8 animate-fade-in pb-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div className="space-y-12 animate-fade-in pb-20">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-white tracking-tight">System Overview</h2>
-                  <p className="text-gray-400 mt-1">Real-time analytics and portfolio performance</p>
+                  <h2 className="text-4xl font-black text-white tracking-tightest mb-2">SYSTEM <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-accent">RESOURCES</span></h2>
+                  <p className="text-gray-500 font-medium text-sm tracking-wide">METRICS AND DATA SYNCHRONIZATION ACTIVE</p>
                 </div>
-                <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  <span className="text-xs font-medium text-gray-300">Database Live</span>
+                <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 px-6 py-3 rounded-2xl backdrop-blur-xl shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                  <div className="relative w-3 h-3">
+                    <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></div>
+                    <div className="relative rounded-full w-3 h-3 bg-green-500"></div>
+                  </div>
+                  <span className="text-xs font-black text-primary tracking-widest">LIVE STATUS: NOMINAL</span>
                 </div>
               </div>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { label: 'Projects', value: projects.length, icon: FileCode2, color: '#6366f1', trend: '+12%' },
-                  { label: 'Certs', value: certifications.length, icon: Award, color: '#a855f7', trend: '+5%' },
-                  { label: 'Skills', value: skills.length, icon: Code2, color: '#10b981', trend: 'Active' },
-                  { label: 'Messages', value: messages.length, icon: MessageSquare, color: '#f59e0b', trend: 'New' }
+                  { label: 'Deployed Projects', value: projects.length, icon: FileCode2, color: '#6366f1', glow: 'shadow-[0_0_25px_rgba(99,102,241,0.2)]' },
+                  { label: 'Validated Certs', value: certifications.length, icon: Award, color: '#a855f7', glow: 'shadow-[0_0_25px_rgba(168,85,247,0.2)]' },
+                  { label: 'Skills Node', value: skills.length, icon: Code2, color: '#10b981', glow: 'shadow-[0_0_25px_rgba(16,185,129,0.2)]' },
+                  { label: 'Comms Inbox', value: messages.length, icon: MessageSquare, color: '#f59e0b', glow: 'shadow-[0_0_25px_rgba(245,158,11,0.2)]' }
                 ].map((stat, i) => (
-                  <div key={i} className="glass-card p-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-                    <div className="relative z-10 flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">{stat.label}</p>
-                        <p className="text-3xl font-bold text-white">{stat.value}</p>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-gray-400 mt-2 inline-block">{stat.trend}</span>
+                  <div key={i} className={`bg-dark/30 backdrop-blur-2xl p-7 rounded-[2rem] border border-white/5 relative overflow-hidden group hover:border-white/10 transition-all duration-500 ${stat.glow}`}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
+                    <div className="relative z-10 flex flex-col gap-4">
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner" style={{ backgroundColor: `${stat.color}15`, color: stat.color, border: `1px solid ${stat.color}30` }}>
+                        <stat.icon size={28} />
                       </div>
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{ backgroundColor: `${stat.color}20`, color: stat.color }}>
-                        <stat.icon size={24} />
+                      <div>
+                        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                        <div className="flex items-end gap-2">
+                          <p className="text-4xl font-black text-white leading-none">{stat.value}</p>
+                          <span className="text-[10px] font-black text-gray-400 mb-1">UNIT</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -336,33 +386,37 @@ const AdminDashboard = () => {
               {/* Charts Row 1 */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Message Trends */}
-                <div className="lg:col-span-2 glass-card p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Inquiry Traffic</h3>
+                <div className="lg:col-span-2 bg-dark/30 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-xl font-black text-white tracking-tight">TRAFFIC ANALYSIS</h3>
+                    <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-lg border border-primary/20">7 DAY LOG</div>
+                  </div>
                   <div className="h-72 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={messageTrendData.length > 0 ? messageTrendData : [{date: 'No Data', count: 0}]}>
                         <defs>
                           <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                        <XAxis dataKey="date" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="date" stroke="#444" fontSize={10} tickLine={false} axisLine={false} tick={{fontWeight: 'bold'}} />
+                        <YAxis stroke="#444" fontSize={10} tickLine={false} axisLine={false} tick={{fontWeight: 'bold'}} />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
-                          itemStyle={{ color: '#6366f1' }}
+                          contentStyle={{ backgroundColor: '#0a0a0f', border: '1px solid #ffffff10', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }}
+                          itemStyle={{ color: '#6366f1', fontWeight: 'bold' }}
+                          cursor={{ stroke: '#6366f1', strokeWidth: 1 }}
                         />
-                        <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
+                        <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorCount)" animationDuration={2000} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 {/* Skills Distribution */}
-                <div className="glass-card p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Skills Mastery</h3>
+                <div className="bg-dark/30 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+                  <h3 className="text-xl font-black text-white tracking-tight mb-8 text-center">NEURAL MAPPING</h3>
                   <div className="h-72 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -370,19 +424,20 @@ const AdminDashboard = () => {
                           data={skillChartData.length > 0 ? skillChartData : [{name: 'Empty', value: 100}]}
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
+                          innerRadius={70}
+                          outerRadius={90}
+                          paddingAngle={8}
                           dataKey="value"
+                          stroke="none"
                         >
                           {(skillChartData.length > 0 ? skillChartData : [1]).map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="outline-none" />
                           ))}
                         </Pie>
                         <Tooltip 
-                           contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
+                           contentStyle={{ backgroundColor: '#0a0a0f', border: '1px solid #ffffff10', borderRadius: '16px', backdropFilter: 'blur(10px)' }}
                         />
-                        <Legend verticalAlign="bottom" height={36}/>
+                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{fontSize: '10px', fontWeight: 'bold', paddingTop: '20px'}} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -392,36 +447,43 @@ const AdminDashboard = () => {
               {/* Charts Row 2 */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Tech Stack usage */}
-                <div className="glass-card p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Top Technologies</h3>
+                <div className="bg-dark/30 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+                  <h3 className="text-xl font-black text-white tracking-tight mb-8">STACK FREQUENCY</h3>
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={techChartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                        <XAxis dataKey="name" stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#666" fontSize={10} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="name" stroke="#444" fontSize={10} tickLine={false} axisLine={false} tick={{fontWeight: 'bold'}} />
+                        <YAxis stroke="#444" fontSize={10} tickLine={false} axisLine={false} tick={{fontWeight: 'bold'}} />
                         <Tooltip 
                           cursor={{fill: '#ffffff05'}}
-                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #ffffff10', borderRadius: '8px' }}
+                          contentStyle={{ backgroundColor: '#0a0a0f', border: '1px solid #ffffff10', borderRadius: '16px', backdropFilter: 'blur(10px)' }}
                         />
-                        <Bar dataKey="count" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="count" fill="url(#barGradient)" radius={[6, 6, 0, 0]} animationDuration={2000}>
+                           <defs>
+                              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#a855f7" />
+                                <stop offset="100%" stopColor="#6366f1" />
+                              </linearGradient>
+                           </defs>
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 {/* Quick Actions / Recent Message */}
-                <div className="glass-card p-6 flex flex-col justify-center text-center">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
-                    <SettingsIcon size={40} />
+                <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/10 flex flex-col justify-center text-center group hover:scale-[1.01] transition-all duration-500 shadow-[0_0_50px_rgba(99,102,241,0.1)]">
+                  <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 text-white shadow-[0_0_30px_rgba(99,102,241,0.4)] group-hover:rotate-12 transition-transform duration-500">
+                    <SettingsIcon size={48} />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Portfolio Settings</h3>
-                  <p className="text-gray-400 text-sm mb-6">Manage your SEO, theme, and site-wide configurations from one place.</p>
+                  <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">CORE ENGINE</h3>
+                  <p className="text-gray-400 text-sm mb-8 font-medium leading-relaxed">ADJUST NEURAL PARAMETERS AND GLOBAL SITE ARCHITECTURE</p>
                   <button 
                     onClick={() => setActiveTab('settings')}
-                    className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors font-bold text-sm"
+                    className="w-full py-4 rounded-2xl bg-white text-black hover:bg-primary hover:text-white transition-all duration-300 font-black text-xs tracking-widest shadow-xl"
                   >
-                    Configure Site
+                    ACCESS SYSTEM CONFIG
                   </button>
                 </div>
               </div>
