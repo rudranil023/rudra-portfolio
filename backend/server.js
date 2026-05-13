@@ -42,12 +42,12 @@ app.get('/.netlify/functions/api', (req, res) => {
 });
 
 // Import Routes
-import authRoutes from './routes/auth.js';
-import projectRoutes from './routes/projects.js';
-import certificationRoutes from './routes/certifications.js';
-import messageRoutes from './routes/messages.js';
-import skillRoutes from './routes/skills.js';
-import settingRoutes from './routes/settings.js';
+import { authRoutes } from './routes/auth.js';
+import { projectRoutes } from './routes/projects.js';
+import { certificationRoutes } from './routes/certifications.js';
+import { messageRoutes } from './routes/messages.js';
+import { skillRoutes } from './routes/skills.js';
+import { settingRoutes } from './routes/settings.js';
 
 const router = express.Router();
 

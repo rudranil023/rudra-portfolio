@@ -39,4 +39,4 @@ router.put('/', authMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+export const settingRoutes = router;

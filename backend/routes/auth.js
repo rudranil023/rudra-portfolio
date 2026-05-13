@@ -92,4 +92,4 @@ router.put('/me/resume', authMiddleware, upload.single('resume'), async (req, re
   }
 });
 
-export default router;
+export const authRoutes = router;

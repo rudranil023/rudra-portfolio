@@ -36,4 +36,4 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+export const messageRoutes = router;
